@@ -51,6 +51,11 @@
         padding: 10px 15px;
         border-bottom: 5px seagreen solid;
       }
+      .movie_list_head:hover{
+        color: black;
+        background-color: greenyellow;
+        cursor: pointer;
+      }
       .movie_list_item td{
         background-color: #F9F9F9;
         border-bottom: 1px #CCC solid;
@@ -78,18 +83,22 @@
     <h1 id="title">Welcome to my Movie App!</h1>
     <div id="form_div">
         <form>
-            <input type="text" id="movie_title" placeholder="Movie title">
-            <input type="number" min="0" max="10" id="movie_rating" placeholder="Rating">
-            <button id="movie_button">Add Movie!</button>
+          <input type="text" id="movie_title" placeholder="Movie title">
+          <input type="number" min="0" max="10" id="movie_rating" placeholder="Rating">
+          <button id="movie_button">Add Movie!</button>
         </form>
     </div>
     <div id="movie_list_container">
         <table id="movie_list">
             <thead>
-                <td class="movie_list_head">Title</td>
-                <td class="movie_list_head">Rating</td>
-                <td class="movie_list_head">---</td>
+              <tr>
+                <th class="movie_list_head">Title</th>
+                <th class="movie_list_head">Rating</th>
+                <th class="movie_list_head"></th>
+              </tr>
             </thead>
+            <tbody>
+            </tbody>
         </table>
     </div>
 </div>
@@ -98,11 +107,17 @@
   // Part Two - Movies App!
   $(document).ready(function(){
     // Build an application that uses jQuery to do the following:
-    //      Contains a form with two inputs for a title and rating along with a button to submit the form.
-    //      When the form is submitted, capture the values for each of the inputs and append them to the DOM along with a button to remove each title and rating from the DOM.
-    //      When the button to remove is clicked, remove each title and rating from the DOM.
+    //      Contains a form with two inputs for a title and rating along with a button to submit the form
+    //      When the form is submitted, capture the values for each of the inputs and append them to the DOM along with a button to remove each title and rating from the DOM
+    //      When the button to remove is clicked, remove each title and rating from the DOM
     function deleteMovie(event){
       const movieTarget = event.target.parentElement.parentElement.remove();
+    }
+    function checkMovieValues(title, rating){
+      return title.length >= 2 && rating >= 0 && rating <= 10 ? true : false;
+    }
+    function sortMovieList(sort){
+      
     }
     
     $("#movie_button").on("click", function(e){
@@ -110,35 +125,52 @@
         const movieTitle = $("#movie_title").val();
         const movieRating = $("#movie_rating").val();
 
-        let movieData = document.createElement('tr');
-        let movieDataTitle = document.createElement('td');
-        movieDataTitle.innerHTML = movieTitle;
-        
-        let movieDataRating = document.createElement('td');
-        movieDataRating.innerHTML = movieRating;
-        
-        let movieDataButton = document.createElement('td');
-        let movieDataBtn = document.createElement('button');
-        movieDataBtn.classList.add('delete_button');
-        movieDataBtn.innerText = "Delete";
-        movieDataBtn.addEventListener("click", deleteMovie);
-        movieDataButton.appendChild(movieDataBtn);
+        if(checkMovieValues(movieTitle, movieRating)){
+          let movieData = document.createElement('tr');
+          let movieDataTitle = document.createElement('td');
+          movieDataTitle.innerHTML = movieTitle;
+          
+          let movieDataRating = document.createElement('td');
+          movieDataRating.innerHTML = movieRating;
+          
+          let movieDataButton = document.createElement('td');
+          let movieDataBtn = document.createElement('button');
+          movieDataBtn.classList.add('delete_button');
+          movieDataBtn.innerText = "Delete";
+          movieDataBtn.addEventListener("click", deleteMovie);
+          movieDataButton.appendChild(movieDataBtn);
 
-        movieData.appendChild(movieDataTitle);
-        movieData.appendChild(movieDataRating);
-        movieData.appendChild(movieDataButton);
-        movieData.classList.add('movie_list_item');
-        
-        $("#movie_list").append(movieData);
-        $("input").val("");
+          movieData.appendChild(movieDataTitle);
+          movieData.appendChild(movieDataRating);
+          movieData.appendChild(movieDataButton);
+          movieData.classList.add('movie_list_item');
+          
+          $("tbody").append(movieData);
+          $("input").val("");
+        }else{
+          alert('The title must have at least 2 characters and the movie rating can only be between 0 and 10');
+        }
     });
 
-    
+    // Further Study:
+    //    Ensure that the rating of a movie can only be between 0 and 10
+    //    Ensure that a title has at least 2 characters in it
+    //    Allow users to sort alphabetically by the title of the movie or by the rating of the movie from lowest to highest and vice versa
+    $("th").each(function(column){
+      $(this).on("click", function(){
+        let movieValues = $("table").find("tbody > tr").get();
 
-    // Further Study
-    // Ensure that the rating of a movie can only be between 0 and 10.
-    // Ensure that a title has at least 2 characters in it.
-    // Allow users to sort alphabetically by the title of the movie or by the rating of the movie from lowest to highest and vice versa.
+        movieValues.sort(function(a, b){
+          let value1 = $(a).children("td").eq(column).text().toUpperCase();
+          let value2 = $(b).children("td").eq(column).text().toUpperCase();
+          return value1 < value2 ? -1 : value1 > value2 ? 1 : 0;
+        });
+
+        $.each(movieValues, function(idx, element){
+          $("tbody").append(element);
+        });
+      });
+    });
   });
 </script>
 </body>
